@@ -148,6 +148,10 @@ class Hello_World extends Widget_Base {
 		$settings = $this->get_settings_for_display();
 
 		?>
+
+
+
+
 			<div class="section-title">
 				<span><?php echo esc_html($settings['section_sub_title']); ?></span>
 				<h2><?php echo esc_html($settings['section_title']); ?></h2>
