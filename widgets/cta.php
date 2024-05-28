@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  *
  * @since 1.0.0
  */
-class Harry_Heading extends Widget_Base {
+class Harry_CTA extends Widget_Base {
 
 	/**
 	 * Retrieve the widget name.
@@ -25,7 +25,7 @@ class Harry_Heading extends Widget_Base {
 	 * @return string Widget name.
 	 */
 	public function get_name() {
-		return 'harry-heading';
+		return 'harry-cta';
 	}
 
 	/**
@@ -38,7 +38,7 @@ class Harry_Heading extends Widget_Base {
 	 * @return string Widget title.
 	 */
 	public function get_title() {
-		return __( 'Harry Heading', 'harry-core' );
+		return __( 'CTA', 'harry-core' );
 	}
 
 	/**
@@ -114,31 +114,17 @@ class Harry_Heading extends Widget_Base {
 				'default' => 'style_01',
 				'options' => [
 					'style_01' => esc_html__( 'Style 01', 'textdomain' ),
-					'style_02' => esc_html__( 'Style 02', 'textdomain' ),
 				]
 			]
 		);
 
 		$this->end_controls_section();
 
-
 		$this->start_controls_section(
 			'harry_title_section',
 			[
 				'label' => esc_html__( 'Title and Content', 'harry-core' ),
 				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
-			]
-		);
-
-		$this->add_control(
-			'is_center',
-			[
-				'label' => esc_html__( 'Center enable?', 'textdomain' ),
-				'type' => \Elementor\Controls_Manager::SWITCHER,
-				'label_on' => esc_html__( 'Show', 'textdomain' ),
-				'label_off' => esc_html__( 'Hide', 'textdomain' ),
-				'return_value' => 'yes',
-				'default' => '',
 			]
 		);
 
@@ -173,6 +159,46 @@ class Harry_Heading extends Widget_Base {
 
 		$this->end_controls_section();
 
+		$this->start_controls_section(
+			'harry_button_section',
+			[
+				'label' => esc_html__( 'Button', 'harry-core' ),
+				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+			]
+		);
+
+		$this->add_control(
+			'harry_button_text',
+			[
+				'label' => esc_html__( 'Button Text', 'harry-core' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'Button Text', 'harry-core' ),
+				'placeholder' => esc_html__( 'Button text here', 'harry-core' ),
+				'label_block' => true,
+			]
+		);
+
+		$this->add_control(
+			'harry_link',
+			[
+				'label' => esc_html__( 'Link', 'textdomain' ),
+				'type' => \Elementor\Controls_Manager::URL,
+				'options' => [ 'url', 'is_external', 'nofollow' ],
+				'default' => [
+					'url' => '',
+					'is_external' => true,
+					'nofollow' => true,
+					// 'custom_attributes' => '',
+				],
+				'label_block' => true,
+			]
+		);
+
+		$this->end_controls_section();
+
+
+
+
 	}
 
 	/**
@@ -186,40 +212,46 @@ class Harry_Heading extends Widget_Base {
 	 */
 	protected function render() {
 		$settings = $this->get_settings_for_display();
+		?>
 
-		if ( ! empty( $settings['harry_link']['url'] ) ) {
-			$this->add_link_attributes( 'button_arg', $settings['harry_link'] );
-			$this->add_render_attribute('button_arg', 'class', 'tp-btn-5 tp-btn-5-white');
-		}
-
-		$is_center = $settings['is_center'] ? 'is-center' : '';
-
+		<?php if($settings['design_style'] == 'style_02') : 
 
 		?>
 
-		<?php if($settings['design_style'] == 'style_02') : ?>
-		<div class="testimonial__wrapper-14 wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
-				<div class="testimonial__info">
-					<div class="section__title-wrapper-9 mb-10">
-						<span class="section__title-pre section__title-pre-1-3"><?php echo esc_html($settings['harry_sub_title']); ?></span>
-					</div>
-					<h3 class="testimonial__info-title has-background" data-background="<?php echo get_template_directory_uri(); ?>/assets/img/testimonial/testimonial-text-bg.jpg"><?php echo wp_kses_post($settings['harry_title']); ?></h3>
-					<p><?php echo esc_html($settings['harry_text']); ?></p>
-				</div>
-		</div>
-		<?php else: ?>		
-		<div class="section__title-wrapper-9 mb-65 <?php echo esc_attr($is_center); ?>">
-		<?php if(!empty($settings['harry_sub_title'])) : ?>
-			<span class="section__title-pre-9"><?php echo esc_html($settings['harry_sub_title']); ?></span>
-			<?php endif; ?>
-			<?php if(!empty($settings['harry_title'])) : ?>
-			<h3 class="section__title-9"><?php echo wp_kses_post($settings['harry_title']); ?></h3>
-			<?php endif; ?>
-			<?php if(!empty($settings['harry_text'])) : ?>
-			<p><?php echo esc_html($settings['harry_text']); ?></p>
-			<?php endif; ?>
-		</div>
+		<?php else: 
+			if ( ! empty( $settings['harry_link']['url'] ) ) {
+				$this->add_link_attributes( 'button_arg', $settings['harry_link'] );
+				$this->add_render_attribute('button_arg', 'class', 'tp-btn-orange-2');
+			}
+		?>	
+
+		<section class="cta__area cta__style-2 p-relative z-index-1">
+            <div class="cta__half-bg"></div>
+            <div class="container">
+               <div class="cta__inner-5" data-bg-color="blue-dark">
+                  <div class="cta__shape-bg include-bg" data-background="assets/img/cta/5/cta-bg.png"></div>
+                  <div class="row align-items-center">
+                     <div class="col-xxl-8 col-xl-8 col-lg-8">
+                        <div class="cta__content-5">
+                           <span><?php echo esc_html($settings['harry_sub_title']); ?></span>
+
+                           <h3 class="cta__title-5"><?php echo wp_kses_post($settings['harry_title']); ?></h3>
+                        </div>
+                     </div>
+					 <?php if(!empty($settings['harry_button_text'])) : ?>
+                     <div class="col-xxl-4 col-xl-4 col-lg-4">
+                        <div class="cta__btn-5 text-lg-end">
+						<a <?php echo $this->get_render_attribute_string( 'button_arg' ); ?>><?php echo esc_html($settings['harry_button_text']); ?></a>
+                        </div>
+                     </div>
+					 <?php endif; ?>
+                  </div>
+               </div>
+            </div>
+         </section>		
 		<?php endif; ?>
+
+
 
 		<?php
 	}
@@ -227,4 +259,4 @@ class Harry_Heading extends Widget_Base {
 }
 
 
-$widgets_manager->register( new Harry_Heading() );
+$widgets_manager->register( new Harry_CTA() );

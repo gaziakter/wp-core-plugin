@@ -26,6 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 
 include_once('inc/functions.php');
+include_once('inc/post-type-portfolio.php');
 
 
 final class Harry_Core_Elements {

@@ -99,6 +99,29 @@ class Harry_About_Me extends Widget_Base {
 	protected function register_controls() {
 
 		$this->start_controls_section(
+			'harry_design_section',
+			[
+				'label' => esc_html__( 'Design Style', 'harry-core' ),
+				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+			]
+		);
+
+		$this->add_control(
+			'design_style',
+			[
+				'label' => esc_html__( 'Choose Style', 'textdomain' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => 'style_01',
+				'options' => [
+					'style_01' => esc_html__( 'Style 01', 'textdomain' ),
+					'style_02' => esc_html__( 'Style 02', 'textdomain' ),
+				]
+			]
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
 			'harry_title_section',
 			[
 				'label' => esc_html__( 'Title and Content', 'harry-core' ),
@@ -174,6 +197,106 @@ class Harry_About_Me extends Widget_Base {
 
 		$this->end_controls_section();
 
+
+		$this->start_controls_section(
+			'harry_social_section',
+			[
+				'label' => esc_html__( 'Social List', 'harry-core' ),
+				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+				'condition' => [
+					'design_style' => ['style_02'],
+				],
+			]
+		);
+
+
+		$repeater = new \Elementor\Repeater();
+
+		$repeater->add_control(
+			'social_title',
+			[
+				'label' => esc_html__( 'Social Title', 'textdomain' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'Strategy' , 'textdomain' ),
+				'label_block' => true,
+			]
+		);
+
+		$repeater->add_control(
+			'select_icon',
+			[
+				'label' => esc_html__( 'Chose Icon Method', 'textdomain' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => 'icon',
+				'options' => [
+					'icon' => esc_html__( 'Icon', 'textdomain' ),
+					'svg'  => esc_html__( 'SVG', 'textdomain' ),
+				],
+			]
+		);
+
+		$repeater->add_control(
+			'icon',
+			[
+				'label' => esc_html__( 'Icon', 'textdomain' ),
+				'type' => \Elementor\Controls_Manager::ICONS,
+				'default' => [
+					'value' => 'fas fa-smile',
+					'library' => 'fa-solid',
+				],
+				'recommended' => [
+					'fa-solid' => [
+						'circle',
+						'dot-circle',
+						'square-full',
+					],
+					'fa-regular' => [
+						'circle',
+						'dot-circle',
+						'square-full',
+					],
+				],
+				'condition' => [
+					'select_icon' => 'icon',
+				],
+			]
+		);
+
+		$repeater->add_control(
+			'harry_svg_icon',
+			[
+				'label' => esc_html__( 'SVG', 'harry-core' ),
+				'type' => \Elementor\Controls_Manager::TEXTAREA,
+				'default' => esc_html__( '', 'harry-core' ),
+				'placeholder' => esc_html__( 'svg icon code here', 'harry-core' ),
+				'condition' => [
+					'select_icon' => 'svg',
+				],
+			]
+		);
+
+		$this->add_control(
+			'harry_social_list',
+			[
+				'label' => esc_html__( 'Social List', 'textdomain' ),
+				'type' => \Elementor\Controls_Manager::REPEATER,
+				'fields' => $repeater->get_controls(),
+				'default' => [
+					[
+						'social_title' => esc_html__( 'Title #1', 'textdomain' ),
+					],
+					[
+						'social_title' => esc_html__( 'Title #2', 'textdomain' ),
+					],
+				],
+				'title_field' => '{{{ social_title }}}',
+			]
+		);
+
+
+		$this->end_controls_section();
+
+
 	}
 
 	/**
@@ -187,15 +310,71 @@ class Harry_About_Me extends Widget_Base {
 	 */
 	protected function render() {
 		$settings = $this->get_settings_for_display();
-
-		if ( ! empty( $settings['harry_link']['url'] ) ) {
-			$this->add_link_attributes( 'button_arg', $settings['harry_link'] );
-			$this->add_render_attribute('button_arg', 'class', 'tp-btn-5 tp-btn-5-white');
-		}
-
-
 		?>
 
+		<?php if($settings['design_style'] == 'style_02') : 
+			if ( ! empty( $settings['harry_link']['url'] ) ) {
+				$this->add_link_attributes( 'button_arg', $settings['harry_link'] );
+				$this->add_render_attribute('button_arg', 'class', 'tp-btn');
+			}
+		?>
+
+		<section class="about__me-info pb-90 pt-110">
+            <div class="container">
+               <div class="row">
+                  <div class="col-xl-4 col-lg-3">
+                     <span class="about__me-info-subtitle"><?php echo esc_html($settings['harry_sub_title']); ?></span>
+                  </div>
+                  <div class="col-xl-8 col-lg-9">
+                     <div class="about__me-info-content wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
+                        <h4 class="about__me-info-title"><?php echo wp_kses_post($settings['harry_title']); ?> <img src="<?php echo get_template_directory_uri(); ?>/assets/img/about/about-me-title-icon.png" alt=""></h4>
+                        <p><?php echo wp_kses_post($settings['harry_text']); ?></p>
+
+                        <div class="about__me-info-bottom d-sm-flex align-items-center mt-40">
+						<?php if(!empty($settings['harry_button_text'])) : ?>
+                           <div class="about__me-info-btn mr-30">
+                              <a <?php echo $this->get_render_attribute_string( 'button_arg' ); ?>>
+							  	<?php echo esc_html($settings['harry_button_text']); ?>
+                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 7H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M7 1L13 7L7 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                 </svg>
+                              </a>
+                           </div>
+						   <?php endif; ?>
+                           <div class="about__me-info-social">
+						   <?php foreach (  $settings['harry_social_list'] as $key => $item ) : ?>
+                              <a href="#">
+								
+							  <?php if(!empty($item['select_icon'] == 'icon')) : ?>
+								<?php \Elementor\Icons_Manager::render_icon( $item['icon'], [ 'aria-hidden' => 'true' ] ); ?>	
+							<?php else: ?>
+							<?php echo $item['harry_svg_icon']; ?>
+							<?php endif; ?>
+							  
+							  <?php echo esc_html($item['social_title']); ?>
+							</a>
+							<?php endforeach; ?>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+
+		<?php elseif($settings['design_style'] == 'style_03') : ?>
+
+		<div>
+			<h1>This is style three</h1>
+		</div>	
+
+		<?php else: 
+			if ( ! empty( $settings['harry_link']['url'] ) ) {
+				$this->add_link_attributes( 'button_arg', $settings['harry_link'] );
+				$this->add_render_attribute('button_arg', 'class', 'tp-btn-5 tp-btn-5-white');
+			}
+		?>	
 		<section class="about__area about__space-145">
             <div class="about__inner-9 black-bg wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
                <div class="container">
@@ -224,6 +403,10 @@ class Harry_About_Me extends Widget_Base {
                </div>
             </div>
          </section>
+		<?php endif; ?>
+
+
+
 		<?php
 	}
 

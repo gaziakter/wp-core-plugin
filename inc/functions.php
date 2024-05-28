@@ -29,18 +29,7 @@ function get_all_post($post_type_name = 'post'){
 }
 
 // get cat slug and name 
-function get_cat_slugs($categories = [],$delimeter = ' ',$term = 'slug'){
-    // $slugs = array_map(function($cat) use ($term){
-    //     // var_dump($cat);
-    //     if ($term == 'slug'){
-    //         return $cat->slug;
-    //     }
-    //     if ($term == 'name'){
-    //         return $cat->name;
-    //     }
-        
-    // },$categories);
-
+function harry_get_cat_data($categories = [],$delimeter = ' ',$term = 'slug'){
     $slugs = [];
     foreach($categories as $cat){
         if ($term == 'slug'){

@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  *
  * @since 1.0.0
  */
-class Harry_Portfolio extends Widget_Base {
+class Harry_Portfolio_Post extends Widget_Base {
 
 	/**
 	 * Retrieve the widget name.
@@ -38,7 +38,7 @@ class Harry_Portfolio extends Widget_Base {
 	 * @return string Widget title.
 	 */
 	public function get_title() {
-		return __( 'Portfolio Post', 'harry-core' );
+		return __( 'Harry Portfolio Post', 'harry-core' );
 	}
 
 	/**
@@ -96,17 +96,22 @@ class Harry_Portfolio extends Widget_Base {
 	 *
 	 * @access protected
 	 */
-
-
-
-
 	protected function register_controls() {
 
 		$this->start_controls_section(
-			'harry_title_section',
+			'harry_post_section',
 			[
-				'label' => esc_html__( 'Title and Content', 'harry-core' ),
+				'label' => esc_html__( 'Portfolio Post', 'harry-core' ),
 				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+			]
+		);
+
+		$this->add_control(
+			'post_per_page',
+			[
+				'label' => esc_html__( 'Post Per Page', 'harry-core' ),
+				'type' => \Elementor\Controls_Manager::NUMBER,
+				'default' => 3,
 			]
 		);
 
@@ -122,9 +127,9 @@ class Harry_Portfolio extends Widget_Base {
 		);
 
 		$this->add_control(
-			'post_not_in',
+			'post_exclude',
 			[
-				'label' => esc_html__( 'Post Not In', 'textdomain' ),
+				'label' => esc_html__( 'Post Exclude', 'textdomain' ),
 				'type' => \Elementor\Controls_Manager::SELECT2,
 				'label_block' => true,
 				'multiple' => true,
@@ -133,11 +138,31 @@ class Harry_Portfolio extends Widget_Base {
 		);
 
 		$this->add_control(
-			'posts_per_page',
+			'order',
 			[
-				'label' => esc_html__( 'Post Per Page', 'harry-core' ),
-				'type' => \Elementor\Controls_Manager::NUMBER,
-				'default' => 3,
+				'label' => esc_html__( 'Order', 'textdomain' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => 'ASC',
+				'options' => [
+					'ASC' => esc_html__( 'ASC', 'textdomain' ),
+					'DFESC'  => esc_html__( 'DESC', 'textdomain' ),
+				],
+			]
+		);
+
+		$this->add_control(
+			'order_by',
+			[
+				'label' => esc_html__( 'Order By', 'textdomain' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => 'date',
+				'options' => [
+					'name' => esc_html__( 'Name', 'textdomain' ),
+					'date'  => esc_html__( 'Date', 'textdomain' ),
+					'title'  => esc_html__( 'Title', 'textdomain' ),
+					'rand'  => esc_html__( 'Rand', 'textdomain' ),
+					'id'  => esc_html__( 'ID', 'textdomain' ),
+				],
 			]
 		);
 
@@ -145,8 +170,6 @@ class Harry_Portfolio extends Widget_Base {
 		$this->end_controls_section();
 
 	}
-
-
 
 	/**
 	 * Render the widget output on the frontend.
@@ -162,32 +185,29 @@ class Harry_Portfolio extends Widget_Base {
 
 		$args = array(
 			'post_type' => 'harry-portfolio',
-			'posts_per_page' => $settings['posts_per_page'],
-			'order' => "DESC",
-			'order_by' => ['title','name','date','ID'],
-			'post_status' => array( 'publish' ),
-			'post__not_in' => $settings['post_not_in'],
-			
+			'order' => $settings['order'],
+			'orderby' => $settings['order_by'],
+			'posts_per_page' => !empty($settings['post_per_page']) ? $settings['post_per_page'] : -1,
+			'post__not_in'=> $settings['post_exclude'],
 		);
 
-		if(!empty($settings['cat_list']) || !empty($settings['cat_exclude'])){
+		if(!empty($settings['cat_list'] )){
 			$args['tax_query'] = array(
 				array(
-				'taxonomy' => 'portfolio-cat',
-				'field' => 'slug',
-				'terms' => (!empty($settings['cat_exclude'])) ? $settings['cat_exclude'] : $settings['cat_list'] ,
-				'operator' => (!empty($settings['cat_exclude'])) ? 'NOT IN' : 'IN',
+					'taxonomy' => 'portfolio-cat',
+					'field' => 'slug',
+					'terms' => !empty($settings['cat_exclude']) ?  $settings['cat_exclude'] : $settings['cat_list'],
+					'operator' => !empty($settings['cat_exclude']) ? 'NOT IN' : 'IN',
 				),
 			);
 		}
 
 		$query = new \WP_Query( $args );
 
-			
 		?>
 
 		<section class="portfolio__area pt-110 pb-75 p-relative fix">
-            <div class="portfolio__shape d-none">
+            <div class="portfolio__shape">
                <img class="portfolio__shape-13" src="assets/img/portfolio/grid/shape/circle-1.png" alt="">
                <img class="portfolio__shape-14" src="assets/img/portfolio/grid/shape/circle-2.png" alt="">
                <img class="portfolio__shape-15" src="assets/img/portfolio/grid/shape/circle-sm.png" alt="">
@@ -205,35 +225,35 @@ class Harry_Portfolio extends Widget_Base {
                      </div>
                   </div>
                </div>
-               <?php if(!empty($settings['cat_list'])) : ?>
+			   <?php if( !empty($settings['cat_list'])) : ?>
                <div class="row">
                   <div class="col-xxl-12">
                      <div class="portfolio__masonary-btn text-center mb-40">
                            <div class="masonary-menu filter-button-group">
                               <button class="active" data-filter="*">All <span><?php echo esc_html($query->post_count); ?></span></button>
-							  <?php foreach ( $settings['cat_list'] as $list ): 
-									$category = get_term_by( 'slug', $list, 'portfolio-cat' );	
-									// var_dump($list);
-							  ?>	
+							<?php foreach ( $settings['cat_list'] as $list ): 
+							   	$category = get_term_by( 'slug', $list, 'portfolio-cat' );	
+								// var_dump( $category);
+							?>
                               <button data-filter=".<?php echo esc_html( $list ); ?>"><?php echo esc_html( post_cat('portfolio-cat')[$list] ); ?> <span><?php echo esc_html($category->count); ?></span></button>
-							  <?php endforeach; ?>
+							 <?php endforeach; ?>	
                            </div>
                      </div>
                   </div>
                </div>
-            	<?php endif; ?>
+			   <?php endif; ?>
 
-               <div class="row tp-gx-4 grid tp-portfolio-load-more ddd" data-show="9">
-			       <?php if ( $query->have_posts() ) : ?>
-					<?php while ( $query->have_posts() ) : $query->the_post();
-						$categories = get_the_terms(get_the_ID(),'portfolio-cat');
-					?>
+               <div class="row tp-gx-4 grid tp-portfolio-load-more" data-show="9">
+				<?php if ( $query->have_posts() ) : ?>
+				<?php while ( $query->have_posts() ) : $query->the_post();
+					$categories = get_the_terms(get_the_ID(),'portfolio-cat');
+				?>	
                   <div class="col-xl-4 col-lg-4 col-md-6 tp-portfolio grid-item <?php echo harry_get_cat_data($categories); ?>">
-                     <div class="portfolio__grid-item mb-40 wows fadeInUps" >
+                     <div class="portfolio__grid-item mb-40">
                         <div class="portfolio__grid-thumb w-img fix">
-                           <a href="portfolio-details.html">
-						   <?php the_post_thumbnail( ); ?>
-                           </a>
+							<a href="<?php the_permalink(); ?>">
+                              <?php the_post_thumbnail(); ?>
+                           	</a>
                            <div class="portfolio__grid-popup">
                               <a href="assets/img/portfolio/grid/portfolio-grid-1.jpg" class="popup-image">
                                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -245,16 +265,16 @@ class Harry_Portfolio extends Widget_Base {
                         </div>
                         <div class="portfolio__grid-content">
                            <h3 class="portfolio__grid-title">
-						   			<a href="<?php the_permalink( ); ?>"><?php the_title( ); ?></a>
+						   		<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                            </h3>
                            <div class="portfolio__grid-bottom">
                               <div class="portfolio__grid-category">
                                  <span>
-                                    <a href="#"><?php echo harry_get_cat_data($categories,', ', 'name'); ?></a>
+                                    <a href="#"><?php echo harry_get_cat_data($categories,'- ', 'name'); ?></a>
                                  </span>
                               </div>
                               <div class="portfolio__grid-show-project">
-                                 <a href="portfolio-details.html" class="portfolio-link-btn">
+                                 <a href="<?php the_permalink(); ?>" class="portfolio-link-btn">
                                     Show project 
                                     <span>
                                        <svg width="26" height="9" viewBox="0 0 26 9" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -268,7 +288,7 @@ class Harry_Portfolio extends Widget_Base {
                         </div>
                      </div>
                   </div>
-				  <?php endwhile; wp_reset_postdata(); endif; ?>		
+				  <?php endwhile; wp_reset_postdata(); endif;  ?> 	
                </div>
                <div class="row">
                   <div class="col-xxl-12">
@@ -286,10 +306,47 @@ class Harry_Portfolio extends Widget_Base {
             </div>
          </section>
 
+
+		<section class="blog__area grey-bg-12 p-relative z-index-1 d-none">
+            <div class="container">
+               <div class="row">
+				<?php if ( $query->have_posts() ) : ?>
+					<?php while ( $query->have_posts() ) : $query->the_post();
+						$categories = get_the_category(get_the_ID());
+					?>	
+                  <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6">
+                     <div class="blog__item-9 mb-30 wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
+                        <div class="blog__thumb-9 w-img fix">
+                           <a href="<?php the_permalink(); ?>">
+                              <?php the_post_thumbnail(); ?>
+                           </a>
+                        </div>
+                        <div class="blog__content-9">
+                           <div class="blog__meta-9">
+                              <span>
+                                 <a href="<?php the_permalink(); ?>"><?php echo get_the_date(); ?></a>
+                              </span>
+                              <span>
+                                 <a href="<?php the_permalink(); ?>"><?php echo esc_html($categories[0]->name); ?></a>
+                              </span>
+                           </div>
+                           <h3 class="blog__title-9">
+                              <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                           </h3>
+                        </div>
+                     </div>
+                  </div>
+
+				 <?php endwhile; wp_reset_postdata(); endif;  ?> 
+
+               </div>
+            </div>
+         </section>
+
 		<?php
 	}
 
 }
 
 
-$widgets_manager->register( new Harry_Portfolio() );
+$widgets_manager->register( new Harry_Portfolio_Post() );
