@@ -117,7 +117,7 @@ class Harry_Portfolio extends Widget_Base {
 				'type' => \Elementor\Controls_Manager::SELECT2,
 				'label_block' => true,
 				'multiple' => true,
-				'options' => post_cat('portfolio-cat'),
+				'options' => post_cat(),
 			]
 		);
 
@@ -128,7 +128,7 @@ class Harry_Portfolio extends Widget_Base {
 				'type' => \Elementor\Controls_Manager::SELECT2,
 				'label_block' => true,
 				'multiple' => true,
-				'options' => get_all_post('harry-portfolio'),
+				'options' => get_all_post(),
 			]
 		);
 
@@ -161,7 +161,7 @@ class Harry_Portfolio extends Widget_Base {
 		$settings = $this->get_settings_for_display();
 
 		$args = array(
-			'post_type' => 'harry-portfolio',
+			'post_type' => 'post',
 			'posts_per_page' => $settings['posts_per_page'],
 			'order' => "DESC",
 			'order_by' => ['title','name','date','ID'],
@@ -173,7 +173,7 @@ class Harry_Portfolio extends Widget_Base {
 		if(!empty($settings['cat_list']) || !empty($settings['cat_exclude'])){
 			$args['tax_query'] = array(
 				array(
-				'taxonomy' => 'portfolio-cat',
+				'taxonomy' => 'category',
 				'field' => 'slug',
 				'terms' => (!empty($settings['cat_exclude'])) ? $settings['cat_exclude'] : $settings['cat_list'] ,
 				'operator' => (!empty($settings['cat_exclude'])) ? 'NOT IN' : 'IN',
@@ -205,30 +205,26 @@ class Harry_Portfolio extends Widget_Base {
                      </div>
                   </div>
                </div>
-               <?php if(!empty($settings['cat_list'])) : ?>
                <div class="row">
                   <div class="col-xxl-12">
                      <div class="portfolio__masonary-btn text-center mb-40">
                            <div class="masonary-menu filter-button-group">
                               <button class="active" data-filter="*">All <span><?php echo esc_html($query->post_count); ?></span></button>
 							  <?php foreach ( $settings['cat_list'] as $list ): 
-									$category = get_term_by( 'slug', $list, 'portfolio-cat' );	
-									// var_dump($list);
+									$category = get_term_by( 'slug', $list, 'category' );	
 							  ?>	
-                              <button data-filter=".<?php echo esc_html( $list ); ?>"><?php echo esc_html( post_cat('portfolio-cat')[$list] ); ?> <span><?php echo esc_html($category->count); ?></span></button>
+                              <button data-filter=".<?php echo esc_html( $list ); ?>"><?php echo esc_html( post_cat()[$list] ); ?> <span><?php echo esc_html($category->count); ?></span></button>
 							  <?php endforeach; ?>
                            </div>
                      </div>
                   </div>
                </div>
-            	<?php endif; ?>
-
                <div class="row tp-gx-4 grid tp-portfolio-load-more ddd" data-show="9">
 			       <?php if ( $query->have_posts() ) : ?>
 					<?php while ( $query->have_posts() ) : $query->the_post();
-						$categories = get_the_terms(get_the_ID(),'portfolio-cat');
+						$categories = get_the_category(get_the_ID());
 					?>
-                  <div class="col-xl-4 col-lg-4 col-md-6 tp-portfolio grid-item <?php echo harry_get_cat_data($categories); ?>">
+                  <div class="col-xl-4 col-lg-4 col-md-6 tp-portfolio grid-item <?php echo get_cat_slugs($categories); ?>">
                      <div class="portfolio__grid-item mb-40 wows fadeInUps" >
                         <div class="portfolio__grid-thumb w-img fix">
                            <a href="portfolio-details.html">
@@ -245,12 +241,12 @@ class Harry_Portfolio extends Widget_Base {
                         </div>
                         <div class="portfolio__grid-content">
                            <h3 class="portfolio__grid-title">
-						   			<a href="<?php the_permalink( ); ?>"><?php the_title( ); ?></a>
+						   <a href="<?php the_permalink( ); ?>"><?php the_title( ); ?></a>
                            </h3>
                            <div class="portfolio__grid-bottom">
                               <div class="portfolio__grid-category">
                                  <span>
-                                    <a href="#"><?php echo harry_get_cat_data($categories,', ', 'name'); ?></a>
+                                    <a href="#"><?php echo get_cat_slugs($categories,', ', 'name'); ?></a>
                                  </span>
                               </div>
                               <div class="portfolio__grid-show-project">
