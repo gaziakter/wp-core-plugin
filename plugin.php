@@ -116,6 +116,13 @@ class Harry_Core_Plugin {
 	 */
 	public function register_widgets( $widgets_manager ) {
 		// Its is now safe to include Widgets files
+		require_once( __DIR__ . '/widgets/accordion.php' );
+		require_once( __DIR__ . '/widgets/newsletter.php' );
+		require_once( __DIR__ . '/widgets/support.php' );
+		require_once( __DIR__ . '/widgets/case-study.php' );
+		require_once( __DIR__ . '/widgets/features-tab.php' );
+		require_once( __DIR__ . '/widgets/about.php' );
+		require_once( __DIR__ . '/widgets/page-banner.php' );
 		require_once( __DIR__ . '/widgets/cta.php' );
 		require_once( __DIR__ . '/widgets/brand.php' );
 		require_once( __DIR__ . '/widgets/portfolio-post.php' );

@@ -25,8 +25,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @since 1.2.0
  */
 
+
 include_once('inc/functions.php');
 include_once('inc/post-type-portfolio.php');
+include_once('inc/post-type-services.php');
+include_once('inc/custom-widget/sidebar-rc-post-widget.php');
+include_once('inc/custom-widget/sidebar-services-post-list.php');
+include_once('inc/custom-widget/contact-form-widget.php');
 
 
 final class Harry_Core_Elements {
