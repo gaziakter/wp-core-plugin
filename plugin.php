@@ -116,6 +116,19 @@ class Harry_Core_Plugin {
 	 */
 	public function register_widgets( $widgets_manager ) {
 		// Its is now safe to include Widgets files
+		require_once( __DIR__ . '/widgets/portfolio-post.php' );
+		require_once( __DIR__ . '/widgets/about-me-big-title.php' );
+		require_once( __DIR__ . '/widgets/contact-info.php' );
+		require_once( __DIR__ . '/widgets/blog-post.php' );
+		// require_once( __DIR__ . '/widgets/portfolio.php' );
+		// require_once( __DIR__ . '/widgets/post.php' );
+		require_once( __DIR__ . '/widgets/testimonial.php' );
+		require_once( __DIR__ . '/widgets/awards.php' );
+		require_once( __DIR__ . '/widgets/experience.php' );
+		require_once( __DIR__ . '/widgets/skill.php' );
+		require_once( __DIR__ . '/widgets/portfolio-list.php' );
+		require_once( __DIR__ . '/widgets/heading.php' );
+		require_once( __DIR__ . '/widgets/button.php' );
 		require_once( __DIR__ . '/widgets/hero.php' );
 		require_once( __DIR__ . '/widgets/about-me.php' );
 		require_once( __DIR__ . '/widgets/process.php' );
